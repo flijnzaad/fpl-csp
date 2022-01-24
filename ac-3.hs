@@ -12,12 +12,14 @@ data Problem    = CSP { vars :: [Variable]
 ac3 :: (Problem, Bool, [Constraint]) -> (Problem, Bool, [Constraint])
 ac3 (p, False, _)   = (p, False, [])
 ac3 (p, True, [])      = (p, True, [])
-ac3 (p@(CSP vars doms cons), True, ((varx,vary),rel):xs) = if stronglookup varx doms == newxdomain then ac3 (p, not $ null newxdomain, xs) else ac3 (CSP vars newdoms cons, True, newqueue) where
-    newxdomain  = revise ((varx,vary),rel) (stronglookup varx doms) (stronglookup vary doms)
-    newdoms     = newxdomain: delete (stronglookup varx doms) doms
-    newqueue    = xs ++ filter (\(arc,rel) -> snd arc == varx) cons
+ac3 (p@(CSP vars doms cons), True, ((varx,vary),rel):xs) = if stronglookup varx doms == newxdomain 
+    then ac3 (p, not $ null newxdomain, xs) 
+    else ac3 (CSP vars newdoms cons, True, newqueue) where
+        newxdomain  = revise ((varx,vary),rel) (stronglookup varx doms) (stronglookup vary doms)
+        newdoms     = newxdomain: delete (stronglookup varx doms) doms
+        newqueue    = xs ++ filter (\(arc,rel) -> snd arc == varx) cons
 
-stronglookup :: Variable -> [Domain] -> Domain
+stronglookup :: Variable -> [Domain] -> Domain 
 stronglookup x v = let (Just y) = lookup x v in (x,y)
 
 revise :: Constraint -> Domain -> Domain -> Domain 

@@ -48,11 +48,11 @@ revise (arc, rel) (varX, x:xs) (varY, ys) =
   if any (\y -> (x, y) `elem` rel) ys
     -- if there is a value y in ys that satisfies the contraint between x and y,
     -- add x to the domain and continue
-    then appendToSnd x (revise (arc, rel) (varX, xs) (varY, ys))
+    then prependToSnd x (revise (arc, rel) (varX, xs) (varY, ys))
     -- if there is none, continue without adding x
     else revise (arc, rel) (varX, xs) (varY, ys)
 -- test case : revise ((100,101),[(x,y)| x<-[1..4], y<-[1..4], x==y]) (100,[1..3]) (101,[2..4])
 
--- append a value to the value list of a domain (the second argument of the tuple)
-appendToSnd :: Value -> Domain -> Domain
-appendToSnd x (varX, xs) = (varX, x:xs)
+-- prepend a value to the value list of a domain (the second argument of the tuple)
+prependToSnd :: Value -> Domain -> Domain
+prependToSnd x (varX, xs) = (varX, x:xs)

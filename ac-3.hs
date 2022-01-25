@@ -56,3 +56,20 @@ revise (arc, rel) (varX, x:xs) (varY, ys) =
 -- prepend a value to the value list of a domain (the second argument of the tuple)
 prependToSnd :: Value -> Domain -> Domain
 prependToSnd x (varX, xs) = (varX, x:xs)
+
+generateSudokuConstraints :: [Variable] -> [Constraint]
+generateSudokuConstraints [] = []
+generateSudokuConstraints (n:xs) = map (\x -> ((n,x), [(y1,y2) | y1 <-[1..9], y2 <- [1..9], y1 /= y2]) 
+    filter (/=n) $ nub ([n + i + 9*j | i <- [- (n `mod` 3) .. 2- (n `mod` 3)], j <- [- (n `div` 9 `mod` 3) .. 2- (n `div` 9 `mod` 3)]] ++
+        [n + i | i <- [- (n `mod` 9) .. 8 - n `mod` 9]] ++
+        [n + 9*i | i <- [- (n `div` 9 `mod` 9) .. 8- (n `div` 9 `mod` 9)]])
+    ++ generateSudokuConstraints xs
+
+generateSudokuDomains :: [Value] -> [Domain]
+generateSudokuDomains [] = []
+generateSudokuDomains (x:xs) | x == 0    = (80 - length xs, [1..9]):generateSudokuDomains xs
+                             | otherwise = (80 - length xs, [x]):generateSudokuDomains xs
+
+sudoku1 :: [Value]
+sudoku1 = concat [[4, 0, 0, 0, 9, 5, 0, 0, 0], [5, 6, 0, 8, 2, 0, 0, 4, 9], [0, 0, 7, 3, 0, 4, 0, 0, 5], [0, 0, 3, 2, 0, 6, 0, 1, 7], [0, 7, 0, 5, 0, 0, 0, 6, 0], [0, 0, 0, 0, 0, 0, 8, 5, 3], [7, 0, 0, 9, 6, 1, 0, 3, 2], [0, 2, 0, 0, 0, 3, 1, 0, 0], [0, 0, 4, 0, 0, 0, 0, 0, 0]]
+

@@ -1,4 +1,5 @@
 import Data.List
+import Data.Char
 
 -- type definitions based on formal definition of CSP in book
 type Variable   = Int 
@@ -89,18 +90,32 @@ sudokuVars = [0..80]
 ac3domain :: [Variable] -> [Domain] -> [Constraint] -> [Domain]
 ac3domain vars doms cons = let (CSP _ y _, _, _) = ac3 (CSP vars doms cons, True, cons) in sortBy (\(a,_) (b,_) -> compare a b) y
 
+-- prints a sudoku
 printSudoku :: [Domain] -> IO ()
+-- base case recursion: done printing
 printSudoku [] = putStr ""
 printSudoku ((n, val@(value:_)):xs) =
   do
     putStr (if val == [value] then show value else "_")
     if n `mod` 3 == 2
+       -- put spaces between different blocks
       then putStr " "
       else putStr ""
     if n `mod` 9 == 8
+       -- put newlines at the end of rows
       then putStr "\n"
       else putStr ""
     if n `mod` 27 == 26
+       -- put extra newlines to vertically separate blocks
       then putStr "\n"
       else putStr ""
     do printSudoku xs
+
+-- solves sudoku in "sudoku.txt" in current directory
+solveSudokuFromFile :: IO ()
+solveSudokuFromFile = do
+  sudokuString <- readFile "./sudoku.txt"
+  -- make the string into a list of Ints
+  let values = map digitToInt sudokuString
+  -- solve the sudoku and print it
+  do printSudoku $ ac3domain sudokuVars (generateSudokuDomains values) (generateSudokuConstraints sudokuVars)

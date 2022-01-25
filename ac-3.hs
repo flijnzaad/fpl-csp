@@ -77,5 +77,7 @@ sudokuVars :: [Variable]
 sudokuVars = [0..80]
 
 --ac3 (CSP sudokuVars (generateSudokuDomains sudoku1) (generateSudokuConstraints sudokuVars), True, generateSudokuConstraints sudokuVars)
+
+--ac3domain sudokuVars (generateSudokuDomains sudoku1) (generateSudokuConstraints sudokuVars)
 ac3domain :: [Variable] -> [Domain] -> [Constraint] -> [Domain]
 ac3domain vars doms cons = let (CSP _ y _, _, _) = ac3 (CSP vars doms cons, True, cons) in sortBy (\(a,_) (b,_) -> compare a b) y

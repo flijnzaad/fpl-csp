@@ -1,19 +1,19 @@
 import Data.List
 
 -- type definitions based on formal definition of CSP in book
-type Variable   = Int
+type Variable   = Int 
 type Value      = Int
 type Domain     = (Variable, [Value])
 type Arc        = (Variable, Variable)
 type Constraint = ( Arc, [(Value, Value)] )
 data Problem    = CSP { vars :: [Variable]
                       , doms :: [Domain]
-                      , cons :: [Constraint] }
+                      , cons :: [Constraint] } deriving Show
 
 -- implementation of the AC-3 function, recursive version of the pseudocode in
 -- the book; calls `revise` helper function. the book version passes a queue
 -- of arcs; we use a list of constraints, since those contain the arcs
-ac3 :: (Problem, Bool, [Constraint]) -> (Problem, Bool, [Constraint])
+ac3 :: (Problem, Bool, [Constraint]) -> (Problem, Bool, [Constraint]) 
 -- if the Bool flag is False, the CSP has no solution, so stop the recursion
 ac3 (p, False, _) = (p, False, [])
 -- if the arc queue is empty, stop the recursion and return True
@@ -59,11 +59,11 @@ prependToSnd x (varX, xs) = (varX, x:xs)
 
 generateSudokuConstraints :: [Variable] -> [Constraint]
 generateSudokuConstraints [] = []
-generateSudokuConstraints (n:xs) = map (\x -> ((n,x), [(y1,y2) | y1 <-[1..9], y2 <- [1..9], y1 /= y2]) 
-    filter (/=n) $ nub ([n + i + 9*j | i <- [- (n `mod` 3) .. 2- (n `mod` 3)], j <- [- (n `div` 9 `mod` 3) .. 2- (n `div` 9 `mod` 3)]] ++
+generateSudokuConstraints (n:xs) = map (\x -> ((n,x), [(y1,y2) | y1 <-[1..9], y2 <- [1..9], y1 /= y2])) 
+    (filter (/=n) (nub ([n + i + 9*j | i <- [- (n `mod` 3) .. 2- (n `mod` 3)], j <- [- (n `div` 9 `mod` 3) .. 2- (n `div` 9 `mod` 3)]] ++
         [n + i | i <- [- (n `mod` 9) .. 8 - n `mod` 9]] ++
-        [n + 9*i | i <- [- (n `div` 9 `mod` 9) .. 8- (n `div` 9 `mod` 9)]])
-    ++ generateSudokuConstraints xs
+        [n + 9*i | i <- [- (n `div` 9 `mod` 9) .. 8- (n `div` 9 `mod` 9)]])))
+        ++ generateSudokuConstraints xs
 
 generateSudokuDomains :: [Value] -> [Domain]
 generateSudokuDomains [] = []
@@ -73,3 +73,9 @@ generateSudokuDomains (x:xs) | x == 0    = (80 - length xs, [1..9]):generateSudo
 sudoku1 :: [Value]
 sudoku1 = concat [[4, 0, 0, 0, 9, 5, 0, 0, 0], [5, 6, 0, 8, 2, 0, 0, 4, 9], [0, 0, 7, 3, 0, 4, 0, 0, 5], [0, 0, 3, 2, 0, 6, 0, 1, 7], [0, 7, 0, 5, 0, 0, 0, 6, 0], [0, 0, 0, 0, 0, 0, 8, 5, 3], [7, 0, 0, 9, 6, 1, 0, 3, 2], [0, 2, 0, 0, 0, 3, 1, 0, 0], [0, 0, 4, 0, 0, 0, 0, 0, 0]]
 
+sudokuVars :: [Variable]
+sudokuVars = [0..80]
+
+--ac3 (CSP sudokuVars (generateSudokuDomains sudoku1) (generateSudokuConstraints sudokuVars), True, generateSudokuConstraints sudokuVars)
+ac3domain :: [Variable] -> [Domain] -> [Constraint] -> [Domain]
+ac3domain vars doms cons = let (CSP _ y _, _, _) = ac3 (CSP vars doms cons, True, cons) in sortBy (\(a,_) (b,_) -> compare a b) y

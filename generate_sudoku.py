@@ -1,5 +1,6 @@
 #Sudoku Generator Algorithm - www.101computing.net/sudoku-generator-algorithm/
 from random import randint, shuffle
+import os
 
 #initialise empty 9 by 9 grid
 grid = []
@@ -158,7 +159,9 @@ while attempts>0:
     #We could stop here, but we can also have another attempt with a different cell just to try to remove more numbers
     attempts -= 1
 
-# flatten the grid into one list
+# flatten the grid into one long list of digits and print to file
 flat_grid = [item for sublist in grid for item in sublist]
-# make the list into one long string of digits
-print(''.join(map(str,flat_grid)), end = "")
+flat_grid = ''.join(map(str,flat_grid))
+with open("sudoku.txt", 'w') as file:
+    file.write(flat_grid)
+print("Sudoku printed to sudoku.txt")

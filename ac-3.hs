@@ -128,3 +128,29 @@ solveSudokuFromFile = do
   let values = map digitToInt sudokuString
   -- solve the sudoku and print it
   do printSudoku $ ac3domain sudokuVars (generateSudokuDomains values) (generateSudokuConstraints sudokuVars)
+
+presentation :: IO ()
+presentation = do
+  sudoku <- readFile "./sudoku.txt"
+  let values = map digitToInt sudoku
+  do printSudokuFromFile values 0
+
+-- for demonstration/presentation purposes only
+printSudokuFromFile :: [Value] -> Int -> IO ()
+printSudokuFromFile [] _ = putStr ""
+printSudokuFromFile (n:xs) i =
+  do
+    putStr (if n /= 0 then show n else "_")
+    if i `mod` 3 == 2
+       -- put spaces between different blocks
+      then putStr " "
+      else putStr ""
+    if i `mod` 9 == 8
+       -- put newlines at the end of rows
+      then putStr "\n"
+      else putStr ""
+    if i `mod` 27 == 26
+       -- put extra newlines to vertically separate blocks
+      then putStr "\n"
+      else putStr ""
+    do printSudokuFromFile xs (i+1)
